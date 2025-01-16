@@ -42,7 +42,7 @@ jobs:
           node-version: '16'
 
       - name: Run Playwright tests
-        run: npm run test  # Assuming your test command is 'npm run test'
+        run: npx playwright test
         env:
           CI: true  # Environment variable to signal the CI environment
 
