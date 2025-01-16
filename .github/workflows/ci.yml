@@ -1,0 +1,63 @@
+name: CI for AiraloUITest
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  install-dependencies:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # You can change this to the version of Node.js you're using
+
+      - name: Install dependencies
+        run: |
+          npm ci  # Use 'npm install' if 'npm ci' is not available
+
+      - name: Install Playwright dependencies
+        run: npx playwright install
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: install-dependencies
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Run Playwright tests
+        run: npm run test  # Assuming your test command is 'npm run test'
+        env:
+          CI: true  # Environment variable to signal the CI environment
+
+  upload-artifacts:
+    runs-on: ubuntu-latest
+    needs: run-tests
+    steps:
+      - name: Upload Playwright test artifacts (screenshots, videos, etc.)
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-artifacts
+          path: |
+            playwright-report/
+            test-results/
+            **/*.png
+            **/*.mp4
+            **/*.json
+
